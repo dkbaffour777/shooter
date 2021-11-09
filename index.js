@@ -47,6 +47,16 @@ const player_AI = new Player(
     0,
     "red"
 );
+// Create the AI player's bullets
+const ai_bullets = new Bullets();
+const ai_bullets_id = new Id();
+
+let ai_bullet_interval = setInterval(() => {
+    let x = (player_AI.x_body + (playerWidth / 4)) + (playerWidth / 4);
+    let y = (2 * playerHeight) + bulletRadius;
+    ai_bullets.add({ id: ai_bullets_id.get(), bullet: new Bullet(x, y, "red") });
+    ai_bullets_id.next();
+}, 300);
 
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -71,6 +81,26 @@ function draw() {
             // For memory management
             if (bullet.y < bulletRadius) {
                 human_bullets.remove(id);
+            }
+        }
+    });
+
+    ai_bullets.get().map(({ id, bullet }) => {
+        bullet.draw()
+        let x_pl_human = player_human.x_body + (playerWidth / 4);
+        // Collosion detection when the human player's bullet hits the head of the AI player
+        if (bullet.y > (player_human.y_head - playerHeight) - bulletRadius
+            && bullet.x > x_pl_human
+            && bullet.x < x_pl_human + (playerWidth / 2)) {
+            bullet.y += 0;
+                        
+        } else {
+            bullet.y += 20;
+
+            // Remove the bullet from the bullets array when it misses the target
+            // For memory management
+            if (bullet.y > (canvas.height - bulletRadius)) {
+                ai_bullets.remove(id);
             }
         }
     });
