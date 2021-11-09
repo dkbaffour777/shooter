@@ -25,6 +25,21 @@ const player_human = new Player(
     "#0095DD"
 );
 
+// Create the human player's bullets' obj
+const human_bullets = new Bullets();
+const human_bullet_id = new Id();
+
+document.addEventListener("click", () => {
+    // Enable shooting when the human player has ammo
+    if(player_human.getAmmo() > 0) {
+        let x = (player_human.x_body + (playerWidth / 4)) + (playerWidth / 4);
+        let y = (canvas.height - (2 * playerHeight)) - bulletRadius;
+        human_bullets.add({ id: human_bullet_id.get(), bullet: new Bullet(x, y, "#0095DD") });
+        human_bullet_id.next();
+        player_human.useAmmo();
+    }
+});
+
 // Create the AI player object
 const player_AI = new Player(
     playerHeight,
@@ -38,6 +53,27 @@ function draw() {
 
     player_human.draw();
     player_AI.draw();
+
+    human_bullets.get().map(({ id, bullet }) => {
+        bullet.draw()
+        let x_pl_AI = player_AI.x_body + (playerWidth / 4);
+        // Collosion detection when the human player's bullet hits the head of the AI player
+        if (bullet.y < (player_AI.y_head + (2 * playerHeight)) + bulletRadius
+            && bullet.x > x_pl_AI
+            && bullet.x < x_pl_AI + (playerWidth / 2)) {
+
+            bullet.y += 0;
+
+        } else {
+            bullet.y -= 10
+
+            // Remove the bullet from the bullets array when it misses the target
+            // For memory management
+            if (bullet.y < bulletRadius) {
+                human_bullets.remove(id);
+            }
+        }
+    });
 
     // Human Player Motion detection and barriers
     if(player_human.motion()) {
