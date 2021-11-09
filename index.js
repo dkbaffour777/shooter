@@ -2,6 +2,9 @@
 import { canvas, ctx } from "./canvas.js";
 // Models
 import { Player, playerHeight, playerWidth } from "./models/Player.js";
+import { Bullet, bulletRadius } from "./models/Bullet.js";
+import { Bullets } from "./models/Bullets.js";
+import { Id } from "./models/Id.js";
 // Closures
 import { ai_motion } from "./closures/ai_motion.js";
 // Player Controls
