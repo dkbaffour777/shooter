@@ -2,6 +2,8 @@
 import { canvas, ctx } from "./canvas.js";
 // Models
 import { Player, playerHeight, playerWidth } from "./models/Player.js";
+// Closures
+import { ai_motion } from "./closures/ai_motion.js";
 // Player Controls
 import { 
     keyDownHandler, keyUpHandler, mouseMoveHandler,
@@ -41,6 +43,21 @@ function draw() {
         }
         else if (leftPressed && player_human.x_body > 0) {
             player_human.x_body -= 7;
+        }
+    }
+    // AI Player Motion detection and barriers
+    // When the direction of the AI player is 1, it moves right
+    // and moves left when it's -1
+    if (ai_motion.get() === 1 && player_AI.x_body < canvas.width - playerWidth) {
+        player_AI.x_body += 7;
+        if (player_AI.x_body > canvas.width - playerWidth) {
+            ai_motion.change();
+        }
+    }
+    else if (ai_motion.get() === -1 && player_AI.x_body > 0) {
+        player_AI.x_body -= 7;
+        if (player_AI.x_body < 0) {
+            ai_motion.change();
         }
     }
 
