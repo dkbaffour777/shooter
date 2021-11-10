@@ -39,6 +39,18 @@ document.addEventListener("click", () => {
         player_human.useAmmo();
     }
 });
+// Create the human player's ammo object for refilling ammo
+const human_ammo = new Bullets();
+const human_ammo_id = new Id();
+let human_ammo_interval = setInterval(() => {
+    // Random drop of the player human ammo 
+    // from the top of the canvas
+    // in every 5 seconds
+    let x = Math.floor(Math.random()*canvas.width);
+    let y = bulletRadius;
+    human_ammo.add({ id: human_ammo_id.get(), live: new Bullet(x, y, "green") });
+    human_ammo_id.next();
+}, 5000);
 
 // Create the AI player object
 const player_AI = new Player(
@@ -104,6 +116,32 @@ function draw() {
             }
         }
     });
+
+    human_ammo.get().map(({ id, live }) => {
+        live.draw()
+        let x_pl_human = player_human.x_body + (playerWidth / 4);
+        // Collosion detection when the human player's live hits the head of the AI player
+        if (live.y > (player_human.y_head - playerHeight)
+            && live.x > x_pl_human
+            && live.x < x_pl_human + (playerWidth / 2)) {
+            live.y += 0;
+
+            player_human.resetAmmo();
+            human_ammo.remove(id);
+
+            // AI player
+            //ai_motion.stop();
+        } else {
+            live.y += 1;
+            //live.x += player_human.x_body;
+
+            // Remove the live from the lives array when it misses the target
+            // For memory management
+            if (live.y > (canvas.height - bulletRadius)) {
+                human_ammo.remove(id);
+            }
+        }
+    })
 
     // Human Player Motion detection and barriers
     if(player_human.motion()) {
