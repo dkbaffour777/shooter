@@ -13,10 +13,6 @@ import {
     leftPressed, rightPressed
 } from "./playerControls.js";
 
-document.addEventListener("keydown", keyDownHandler, false);
-document.addEventListener("keyup", keyUpHandler, false);
-document.addEventListener("mousemove", (ele) => mouseMoveHandler(ele, player_human, canvas), false);
-
 // Create the human player object
 const player_human = new Player(
     canvas.height - (2 * playerHeight),
@@ -75,7 +71,6 @@ const endGame =(msg)=> {
     clearInterval(ai_bullet_interval);
     ai_motion.stop();
     player_human.stopMotion();
-    //drawMessage(msg, color);
     human_bullets.empty();
     human_ammo.empty();
     ai_bullets.empty();
@@ -184,4 +179,18 @@ const draw =()=> {
 }
 
 draw();
+
+
+document.querySelector("#open-inst").addEventListener("click", ()=> {
+    document.querySelector("#inst").style.display = "flex";
+});
+
+document.querySelector("#close-inst").addEventListener("click", ()=> {
+    document.querySelector("#inst").style.display = "none";
+});
+
+document.addEventListener("keydown", keyDownHandler, false);
+document.addEventListener("keyup", keyUpHandler, false);
+document.addEventListener("mousemove", (ele) => mouseMoveHandler(ele, player_human, canvas), false);
+
 

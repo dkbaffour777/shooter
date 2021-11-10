@@ -41,6 +41,7 @@ export class Player {
         this.width = 45;
     }
     #ammo = 2;
+    #isMotion = true;
     resetAmmo() {
         this.#ammo = 2;
     }
@@ -50,7 +51,6 @@ export class Player {
     useAmmo() {
         this.#ammo -= 1;
     }
-    #isMotion = true;
     stopMotion() {
         this.#isMotion = false;
     }
