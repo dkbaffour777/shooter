@@ -2,11 +2,10 @@
 import { canvas, ctx } from "./canvas.js";
 // Models
 import { Player, playerHeight, playerWidth } from "./models/Player.js";
+import { AI_Player } from "./models/AI_Player.js";
 import { Bullet, bulletRadius } from "./models/Bullet.js";
 import { Bullets } from "./models/Bullets.js";
 import { Id } from "./models/Id.js";
-// Closures
-import { ai_motion } from "./closures/ai_motion.js";
 // Player Controls
 import { 
     keyDownHandler, keyUpHandler, mouseMoveHandler,
@@ -49,7 +48,7 @@ let human_ammo_interval = setInterval(() => {
 }, 5000);
 
 // Create the AI player object
-const player_AI = new Player(
+const player_AI = new AI_Player(
     playerHeight,
     (canvas.width - playerWidth) / 2,
     0,
@@ -69,7 +68,7 @@ let ai_bullet_interval = setInterval(() => {
 const endGame =(msg)=> {
     clearInterval(human_ammo_interval);
     clearInterval(ai_bullet_interval);
-    ai_motion.stop();
+    player_AI.stopMotion();
     player_human.stopMotion();
     human_bullets.empty();
     human_ammo.empty();
@@ -162,16 +161,16 @@ const draw =()=> {
     // AI Player Motion detection and barriers
     // When the direction of the AI player is 1, it moves right
     // and moves left when it's -1
-    if (ai_motion.get() === 1 && player_AI.x_body < canvas.width - playerWidth) {
+    if (player_AI.getDirection() === 1 && player_AI.x_body < canvas.width - playerWidth) {
         player_AI.x_body += 7;
         if (player_AI.x_body > canvas.width - playerWidth) {
-            ai_motion.change();
+            player_AI.changeDirection();
         }
     }
-    else if (ai_motion.get() === -1 && player_AI.x_body > 0) {
+    else if (player_AI.getDirection() === -1 && player_AI.x_body > 0) {
         player_AI.x_body -= 7;
         if (player_AI.x_body < 0) {
-            ai_motion.change();
+            player_AI.changeDirection();
         }
     }
 
