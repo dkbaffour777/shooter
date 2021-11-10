@@ -48,7 +48,7 @@ let human_ammo_interval = setInterval(() => {
     // in every 5 seconds
     let x = Math.floor(Math.random()*canvas.width);
     let y = bulletRadius;
-    human_ammo.add({ id: human_ammo_id.get(), live: new Bullet(x, y, "green") });
+    human_ammo.add({ id: human_ammo_id.get(), ammo: new Bullet(x, y, "green") });
     human_ammo_id.next();
 }, 5000);
 
@@ -70,7 +70,22 @@ let ai_bullet_interval = setInterval(() => {
     ai_bullets_id.next();
 }, 300);
 
-function draw() {
+const endGame =(msg)=> {
+    clearInterval(human_ammo_interval);
+    clearInterval(ai_bullet_interval);
+    ai_motion.stop();
+    player_human.stopMotion();
+    //drawMessage(msg, color);
+    human_bullets.empty();
+    human_ammo.empty();
+    ai_bullets.empty();
+    setTimeout(() => {
+        alert(msg);
+        document.location.reload();
+    }, 1000);
+}
+
+const draw =()=> {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     player_human.draw();
@@ -85,7 +100,7 @@ function draw() {
             && bullet.x < x_pl_AI + (playerWidth / 2)) {
 
             bullet.y += 0;
-
+            endGame("You won!");
         } else {
             bullet.y -= 10
 
@@ -105,7 +120,7 @@ function draw() {
             && bullet.x > x_pl_human
             && bullet.x < x_pl_human + (playerWidth / 2)) {
             bullet.y += 0;
-                        
+            endGame("Game over. Player AI won!");            
         } else {
             bullet.y += 20;
 
@@ -117,27 +132,24 @@ function draw() {
         }
     });
 
-    human_ammo.get().map(({ id, live }) => {
-        live.draw()
+    human_ammo.get().map(({ id, ammo }) => {
+        ammo.draw()
         let x_pl_human = player_human.x_body + (playerWidth / 4);
-        // Collosion detection when the human player's live hits the head of the AI player
-        if (live.y > (player_human.y_head - playerHeight)
-            && live.x > x_pl_human
-            && live.x < x_pl_human + (playerWidth / 2)) {
-            live.y += 0;
+        // Collosion detection when the human player's ammo hits the head of the AI player
+        if (ammo.y > (player_human.y_head - playerHeight)
+            && ammo.x > x_pl_human
+            && ammo.x < x_pl_human + (playerWidth / 2)) {
+            ammo.y += 0;
 
             player_human.resetAmmo();
             human_ammo.remove(id);
 
-            // AI player
-            //ai_motion.stop();
         } else {
-            live.y += 1;
-            //live.x += player_human.x_body;
+            ammo.y += 1;
 
-            // Remove the live from the lives array when it misses the target
+            // Remove the ammo from the ammos array when it misses the target
             // For memory management
-            if (live.y > (canvas.height - bulletRadius)) {
+            if (ammo.y > (canvas.height - bulletRadius)) {
                 human_ammo.remove(id);
             }
         }
