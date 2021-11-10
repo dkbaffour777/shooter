@@ -29,7 +29,8 @@ document.addEventListener("click", () => {
     if(player_human.getAmmo() > 0) {
         let x = (player_human.x_body + (playerWidth / 4)) + (playerWidth / 4);
         let y = (canvas.height - (2 * playerHeight)) - bulletRadius;
-        human_bullets.add({ id: human_bullet_id.get(), bullet: new Bullet(x, y, "#0095DD") });
+        let spd = 10;
+        human_bullets.add({ id: human_bullet_id.get(), bullet: new Bullet(x, y, spd, "#0095DD") });
         human_bullet_id.next();
         player_human.useAmmo();
     }
@@ -43,7 +44,8 @@ let human_ammo_interval = setInterval(() => {
     // in every 5 seconds
     let x = Math.floor(Math.random()*canvas.width);
     let y = bulletRadius;
-    human_ammo.add({ id: human_ammo_id.get(), ammo: new Bullet(x, y, "green") });
+    let spd = 1;
+    human_ammo.add({ id: human_ammo_id.get(), ammo: new Bullet(x, y, spd, "green") });
     human_ammo_id.next();
 }, 5000);
 
@@ -61,7 +63,8 @@ const ai_bullets_id = new Id();
 let ai_bullet_interval = setInterval(() => {
     let x = (player_AI.x_body + (playerWidth / 4)) + (playerWidth / 4);
     let y = (2 * playerHeight) + bulletRadius;
-    ai_bullets.add({ id: ai_bullets_id.get(), bullet: new Bullet(x, y, "red") });
+    let spd = 20;
+    ai_bullets.add({ id: ai_bullets_id.get(), bullet: new Bullet(x, y, spd, "red") });
     ai_bullets_id.next();
 }, 300);
 
@@ -70,13 +73,13 @@ const endGame =(msg)=> {
     clearInterval(ai_bullet_interval);
     player_AI.stopMotion();
     player_human.stopMotion();
-    human_bullets.empty();
-    human_ammo.empty();
-    ai_bullets.empty();
-    setTimeout(() => {
+    human_bullets.stopMotion();
+    human_ammo.stopMotion();
+    ai_bullets.stopMotion();
+    /* setTimeout(() => {
         alert(msg);
         document.location.reload();
-    }, 1000);
+    }, 1000); */
 }
 
 const draw =()=> {
@@ -96,7 +99,7 @@ const draw =()=> {
             bullet.y += 0;
             endGame("You won!");
         } else {
-            bullet.y -= 10
+            bullet.y -= bullet.spd;
 
             // Remove the bullet from the bullets array when it misses the target
             // For memory management
@@ -116,7 +119,7 @@ const draw =()=> {
             bullet.y += 0;
             endGame("Game over. Player AI won!");            
         } else {
-            bullet.y += 20;
+            bullet.y += bullet.spd;
 
             // Remove the bullet from the bullets array when it misses the target
             // For memory management
@@ -139,7 +142,7 @@ const draw =()=> {
             human_ammo.remove(id);
 
         } else {
-            ammo.y += 1;
+            ammo.y += ammo.spd;
 
             // Remove the ammo from the ammos array when it misses the target
             // For memory management

@@ -54,6 +54,9 @@ export class Player {
     stopMotion() {
         this.#isMotion = false;
     }
+    startMotion() {
+        this.#isMotion = true;
+    }
     motion() {
         return this.#isMotion;
     }

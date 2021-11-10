@@ -3,10 +3,15 @@ import { ctx } from "../canvas.js";
 export let bulletRadius = 10;
 
 export class Bullet {
-    constructor(x, y, color) {
+    constructor(x, y, spd, color) {
         this.x = x;
         this.y = y;
+        this.spd = spd;
         this.color = color;
+    }
+    stopMotion() {
+        this.x = 0;
+        this.y = 0;
     }
     draw() {
         ctx.beginPath();
