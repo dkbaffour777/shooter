@@ -1,13 +1,14 @@
 // Canvas
 import { canvas, ctx } from "./canvas.js";
 // Models
+import { Game } from "./models/Game.js";
 import { Player, playerHeight, playerWidth } from "./models/Player.js";
 import { AI_Player } from "./models/AI_Player.js";
 import { Bullet, bulletRadius } from "./models/Bullet.js";
 import { Bullets } from "./models/Bullets.js";
 import { Id } from "./models/Id.js";
 // Player Controls
-import { 
+import {
     keyDownHandler, keyUpHandler, mouseMoveHandler,
     leftPressed, rightPressed
 } from "./playerControls.js";
@@ -24,17 +25,6 @@ const player_human = new Player(
 const human_bullets = new Bullets();
 const human_bullet_id = new Id();
 
-document.addEventListener("click", () => {
-    // Enable shooting when the human player has ammo
-    if(player_human.getAmmo() > 0) {
-        let x = (player_human.x_body + (playerWidth / 4)) + (playerWidth / 4);
-        let y = (canvas.height - (2 * playerHeight)) - bulletRadius;
-        let spd = 10;
-        human_bullets.add({ id: human_bullet_id.get(), bullet: new Bullet(x, y, spd, "#0095DD") });
-        human_bullet_id.next();
-        player_human.useAmmo();
-    }
-});
 // Create the human player's ammo object for refilling ammo
 const human_ammo = new Bullets();
 const human_ammo_id = new Id();
@@ -42,11 +32,13 @@ let human_ammo_interval = setInterval(() => {
     // Random drop of the player human ammo 
     // from the top of the canvas
     // in every 5 seconds
-    let x = Math.floor(Math.random()*canvas.width);
-    let y = bulletRadius;
-    let spd = 1;
-    human_ammo.add({ id: human_ammo_id.get(), ammo: new Bullet(x, y, spd, "green") });
-    human_ammo_id.next();
+    if (game.getMode() === "play") {
+        let x = Math.floor(Math.random() * canvas.width);
+        let y = bulletRadius;
+        let spd = 1;
+        human_ammo.add({ id: human_ammo_id.get(), ammo: new Bullet(x, y, spd, "green") });
+        human_ammo_id.next();
+    }
 }, 5000);
 
 // Create the AI player object
@@ -61,28 +53,22 @@ const ai_bullets = new Bullets();
 const ai_bullets_id = new Id();
 
 let ai_bullet_interval = setInterval(() => {
-    let x = (player_AI.x_body + (playerWidth / 4)) + (playerWidth / 4);
-    let y = (2 * playerHeight) + bulletRadius;
-    let spd = 20;
-    ai_bullets.add({ id: ai_bullets_id.get(), bullet: new Bullet(x, y, spd, "red") });
-    ai_bullets_id.next();
+    if (game.getMode() === "play") {
+        let x = (player_AI.x_body + (playerWidth / 4)) + (playerWidth / 4);
+        let y = (2 * playerHeight) + bulletRadius;
+        let spd = 20;
+        ai_bullets.add({ id: ai_bullets_id.get(), bullet: new Bullet(x, y, spd, "red") });
+        ai_bullets_id.next();
+    }
 }, 300);
 
-const endGame =(msg)=> {
-    clearInterval(human_ammo_interval);
-    clearInterval(ai_bullet_interval);
-    player_AI.stopMotion();
-    player_human.stopMotion();
-    human_bullets.stopMotion();
-    human_ammo.stopMotion();
-    ai_bullets.stopMotion();
-    /* setTimeout(() => {
-        alert(msg);
-        document.location.reload();
-    }, 1000); */
-}
+const _players = [player_human, player_AI];
+const _intervals = [human_ammo_interval, ai_bullet_interval];
+const _bullets = [human_ammo, ai_bullets, human_bullets];
+const _msgEle = document.querySelector("#gmsg");
+const game = new Game(_players, _intervals, _bullets, _msgEle);
 
-const draw =()=> {
+const draw = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     player_human.draw();
@@ -97,9 +83,11 @@ const draw =()=> {
             && bullet.x < x_pl_AI + (playerWidth / 2)) {
 
             bullet.y += 0;
-            endGame("You won!");
+            game.end("You won!");
         } else {
-            bullet.y -= bullet.spd;
+            if (game.getMode() === "play") {
+                bullet.y -= bullet.spd;
+            }
 
             // Remove the bullet from the bullets array when it misses the target
             // For memory management
@@ -117,9 +105,11 @@ const draw =()=> {
             && bullet.x > x_pl_human
             && bullet.x < x_pl_human + (playerWidth / 2)) {
             bullet.y += 0;
-            endGame("Game over. Player AI won!");            
+            game.end("Game over. Player AI won!");
         } else {
-            bullet.y += bullet.spd;
+            if (game.getMode() === "play") {
+                bullet.y += bullet.spd;
+            }
 
             // Remove the bullet from the bullets array when it misses the target
             // For memory management
@@ -142,8 +132,9 @@ const draw =()=> {
             human_ammo.remove(id);
 
         } else {
-            ammo.y += ammo.spd;
-
+            if (game.getMode() === "play") {
+                ammo.y += ammo.spd;
+            }
             // Remove the ammo from the ammos array when it misses the target
             // For memory management
             if (ammo.y > (canvas.height - bulletRadius)) {
@@ -153,7 +144,7 @@ const draw =()=> {
     })
 
     // Human Player Motion detection and barriers
-    if(player_human.motion()) {
+    if (player_human.motion()) {
         if (rightPressed && player_human.x_body < canvas.width - playerWidth) {
             player_human.x_body += 7;
         }
@@ -182,12 +173,39 @@ const draw =()=> {
 
 draw();
 
+document.addEventListener("click", (e) => {
+    // Enable shooting when the human player has ammo
+    const doDefault = () => {
+        if (player_human.getAmmo() > 0 && game.getMode() === "play") {
+            let x = (player_human.x_body + (playerWidth / 4)) + (playerWidth / 4);
+            let y = (canvas.height - (2 * playerHeight)) - bulletRadius;
+            let spd = 10;
+            human_bullets.add({ id: human_bullet_id.get(), bullet: new Bullet(x, y, spd, "#0095DD") });
+            human_bullet_id.next();
+            player_human.useAmmo();
+        }
+    }
+    switch (e.target.outerText) {
+        case "Play":
+            game.play();
+            break;
+        case "Pause":
+            game.pause();
+            break;
+        case "Game Instructions":
+            game.pause();
+            break;
+        default:
+            doDefault();
+            break;
+    }
+});
 
-document.querySelector("#open-inst").addEventListener("click", ()=> {
+document.querySelector("#open-inst").addEventListener("click", () => {
     document.querySelector("#inst").style.display = "flex";
 });
 
-document.querySelector("#close-inst").addEventListener("click", ()=> {
+document.querySelector("#close-inst").addEventListener("click", () => {
     document.querySelector("#inst").style.display = "none";
 });
 

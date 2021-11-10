@@ -9,10 +9,6 @@ export class Bullet {
         this.spd = spd;
         this.color = color;
     }
-    stopMotion() {
-        this.x = 0;
-        this.y = 0;
-    }
     draw() {
         ctx.beginPath();
         ctx.arc(this.x, this.y, bulletRadius, 0, Math.PI * 2);
