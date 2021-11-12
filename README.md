@@ -6,7 +6,7 @@ A shooting game created with HTML, CSS, vanilla javascript and the canvas API.
 
 Deployed link  https://dkbaffour777.github.io/shooter/
 
-!['shooter'](images/shooter.PNG);
+!['shooter'](images/shooter.png);
 
     
 ## Usage 
