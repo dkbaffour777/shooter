@@ -10,6 +10,7 @@ Deployed link  https://dkbaffour777.github.io/shooter/
 
     
 ## Usage 
+  - Must run application on a local server after cloning the project. 
   - Instructions on how to play the game:
     - This is your player(human player), the highlighted part(red color) is the head of the player
     - !['human_head'](images/human_player_head.png);
