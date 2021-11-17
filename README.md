@@ -6,16 +6,16 @@ A shooting game created with HTML, CSS, vanilla javascript and the canvas API.
 
 Deployed link  https://dkbaffour777.github.io/shooter/
 
-!['shooter'](assets/images/shooter.png);
+!['shooter'](assets/images/shooter.png)
 
     
 ## Usage 
   - Must run application on a local server after cloning the project. 
   - Instructions on how to play the game:
     - This is your player(human player), the highlighted part(red color) is the head of the player
-    - !['human_head'](assets/images/human_player_head.png);
+    - !['human_head'](assets/images/human_player_head.png)
     - This is the AI player, the highlighted part(sky blue) is the head of the player
-    - !['ai_player_head'](assets/images/ai_player_head.png);
+    - !['ai_player_head'](assets/images/ai_player_head.png)
     - Click play to start the game
     - Click pause to pause the game
     - Use your mouse/trackpad/left arrow/right arrow, to move your player to the left or right
